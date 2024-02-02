@@ -9,7 +9,7 @@ function SendMoney() {
   const [success, setSuccess] = useState(false);
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
-  const name = searchParams.get("name");
+  const [firstName, lastName] = searchParams.get("name").split("@");
   const [amount, setAmount] = useState(0);
   const userLoginData = useRecoilValue(userLogin);
   const navigate = useNavigate();
@@ -50,10 +50,12 @@ function SendMoney() {
             <div className='flex items-center space-x-4'>
               <div className='w-12 h-12 rounded-full bg-green-500 flex items-center justify-center'>
                 <span className='text-2xl text-white'>
-                  {name[0].toUpperCase()}
+                  {firstName[0].toUpperCase()}
                 </span>
               </div>
-              <h3 className='text-2xl font-semibold'>{name}</h3>
+              <h3 className='text-2xl font-semibold'>
+                {firstName} {lastName}
+              </h3>
             </div>
             <div className='space-y-4'>
               <div className='space-y-2'>

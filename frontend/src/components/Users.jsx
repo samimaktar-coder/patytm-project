@@ -9,9 +9,9 @@ function User({ user }) {
   const navigate = useNavigate();
 
   return (
-    <div className='flex justify-between'>
+    <div className='flex justify-between my-2'>
       <div className='flex'>
-        <div className='rounded-full h-12 w-12 bg-blue-600 flex justify-center mt-1 mr-2'>
+        <div className='rounded-full h-12 w-12 bg-green-600 flex justify-center mt-1 mr-2'>
           <div className='flex flex-col justify-center h-full text-xl'>
             {user.firstName[0]}
           </div>
@@ -26,7 +26,14 @@ function User({ user }) {
       <div className='flex flex-col justify-center h-ful'>
         <Button
           onClick={(e) => {
-            navigate("/send?id=" + user._id + "&name=" + user.firstName);
+            navigate(
+              "/send?id=" +
+                user._id +
+                "&name=" +
+                user.firstName +
+                "@" +
+                user.lastName
+            );
           }}
           label={"Send Money"}
         />
@@ -62,7 +69,7 @@ function Users() {
           className='w-full px-2 py-1 border rounded text-black outline-none border-slate-200'
         ></input>
       </div>
-      <div>
+      <div className='h-72 overflow-y-auto'>
         {userDataInfo !== null &&
           users.map(
             (user) =>
