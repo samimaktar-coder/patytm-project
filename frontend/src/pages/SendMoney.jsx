@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { userLogin } from "../atom/userLogin";
@@ -7,16 +7,27 @@ import SendSuccessFully from "../assets/money.gif";
 
 function SendMoney() {
   const [success, setSuccess] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const [firstName, lastName] = searchParams.get("name").split("@");
   const [amount, setAmount] = useState(0);
   const userLoginData = useRecoilValue(userLogin);
   const navigate = useNavigate();
+  const [balance, setBalance] = useState(0);
 
-  if (!userLoginData) {
-    return navigate("/");
-  }
+  useEffect(() => {
+    if (!userLoginData) {
+      return navigate("/");
+    }
+    axios
+      .get("http://localhost:3000/api/v1/account/balance", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      })
+      .then((res) => setBalance(res.data.balance));
+  }, []);
 
   const sendMoneyFunc = async () => {
     axios.post(
@@ -68,16 +79,30 @@ function SendMoney() {
                 <input
                   onChange={(e) => {
                     setAmount(e.target.value);
+                    if (e.target.value > balance) {
+                      setShowWarning(true);
+                    } else {
+                      setShowWarning(false);
+                    }
                   }}
                   type='number'
                   className='flex h-10 w-full rounded-md border border-input bg-background text-black px-3 py-2 text-sm outline-none'
                   id='amount'
                   placeholder='Enter amount'
                 />
+                {showWarning && (
+                  <p className='text-red-400 text-xs'>
+                    You do not hav sufficient balance to proceed this process.
+                  </p>
+                )}
               </div>
               <button
-                onClick={sendMoneyFunc}
-                className='justify-center rounded-md text-lg font-medium ring-offset-background transition-colors h-10 px-4 py-2 w-full bg-green-600 text-white'
+                onClick={!showWarning && sendMoneyFunc}
+                className={`justify-center rounded-md text-lg font-medium ring-offset-background transition-colors h-10 px-4 py-2 w-full bg-green-600 text-white ${
+                  showWarning
+                    ? "opacity-75 pointer-events-none"
+                    : ""
+                }`}
               >
                 Initiate Transfer
               </button>
